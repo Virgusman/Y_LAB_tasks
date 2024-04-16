@@ -2,6 +2,7 @@ package out.service;
 
 import out.entites.Training;
 import out.repositories.TrainingRepository;
+import out.repositories.TrainingRepositoryImpl;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -15,7 +16,7 @@ public class TrainingService {
     private final TrainingRepository trainingRepository;
 
     public TrainingService() {
-        this.trainingRepository = new TrainingRepository();
+        this.trainingRepository = new TrainingRepositoryImpl();
     }
 
     /**

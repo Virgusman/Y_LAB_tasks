@@ -6,13 +6,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import out.entites.User;
 import out.repositories.UserRepository;
+import out.repositories.UserRepositoryImpl;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class UserRepositoryTest {
 
     @Rule
-    public static UserRepository userRepository = new UserRepository();
+    public static UserRepository userRepository = new UserRepositoryImpl();
 
     @BeforeAll
     @DisplayName("Добавление тестовых пользователей")

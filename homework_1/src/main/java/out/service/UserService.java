@@ -4,6 +4,7 @@ import in.Menu;
 import out.entites.Role;
 import out.entites.User;
 import out.repositories.UserRepository;
+import out.repositories.UserRepositoryImpl;
 
 /**
  * Бизнес логина по работе с пользователями
@@ -13,7 +14,7 @@ public class UserService {
     private final UserRepository userRepository;
 
     public UserService() {
-        this.userRepository = new UserRepository();
+        this.userRepository = new UserRepositoryImpl();
     }
 
     /**
