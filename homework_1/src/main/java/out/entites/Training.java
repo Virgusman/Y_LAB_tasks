@@ -1,74 +1,37 @@
 package out.entites;
 
+import lombok.Getter;
+import lombok.Setter;
 import java.time.LocalDate;
 import java.util.Objects;
-
 
 /**
  * Сущность "Тренировка"
  */
+@Getter
+@Setter
 public class Training {
 
     /** Дата тренировки */
-    LocalDate date; //Дата тренировки
+    private LocalDate date;
 
     /** Тип тренировки */
-    String type;
+    private String type;
 
     /** Затраченное время на тренировку в минутах */
-    int duration;
+    private int duration;
 
     /** Калории */
-    int caloriesBurned;
+    private int caloriesBurned;
 
     /** Дополнительная информация */
-    String comment;
+    private String comment;
 
     public Training(LocalDate date, String type, int duration, int caloriesBurned, String comment) {
         this.date = date;
         this.type = type;
         this.duration = duration;
         this.caloriesBurned = caloriesBurned;
-        this.comment = comment;
-    }
-
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public int getDuration() {
-        return duration;
-    }
-
-    public void setDuration(int duration) {
-        this.duration = duration;
-    }
-
-    public int getCaloriesBurned() {
-        return caloriesBurned;
-    }
-
-    public void setCaloriesBurned(int caloriesBurned) {
-        this.caloriesBurned = caloriesBurned;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
         this.comment = comment;
     }
 

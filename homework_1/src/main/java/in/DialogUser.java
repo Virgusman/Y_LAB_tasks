@@ -18,17 +18,27 @@ import static in.lexicon.Rus.*;
  */
 public class DialogUser {
 
-    static Scanner sc = new Scanner(System.in);
+    private final Scanner sc = new Scanner(System.in);
 
     /**
      * Выбор действия пользователя
      */
-    static int choice = 0;
+    private int choice = 0;
 
     /**
      * Отслеживаемый логин пользователя
      */
-    static String userLogin = "Неизвестный";
+    private String userLogin = "Неизвестный";
+
+
+    private final TrainingService trainingService;
+
+    private final UserService userService;
+
+    public DialogUser() {
+        this.trainingService = new TrainingService();
+        this.userService = new UserService();
+    }
 
     /**
      * Диалог с пользователем
@@ -36,7 +46,7 @@ public class DialogUser {
      * @param menu определение раздела меню
      * @return возвращение нового раздела меню
      */
-    public static Menu run(Menu menu) {
+    public Menu run(Menu menu) {
 
         switch (menu) {
             case MAIN -> {
@@ -124,9 +134,9 @@ public class DialogUser {
     /**
      * Просмотр всех тренировок всех пользователей (для админа)
      */
-    private static void getAllTrainUsers() {
-        HashMap<String, HashSet<Training>> trainings = TrainingService.getAllTrainUsers();
-        for (Map.Entry<String, HashSet<Training>> entry : trainings.entrySet()) {
+    private void getAllTrainUsers() {
+        Map<String, Set<Training>> trainings = trainingService.getAllTrainUsers();
+        for (Map.Entry<String, Set<Training>> entry : trainings.entrySet()) {
             System.out.println("Тренировки учетной записи: " + entry.getKey());
             for (Training train : entry.getValue()) {
                 System.out.println(train);
@@ -137,14 +147,14 @@ public class DialogUser {
     /**
      * Просмотр потраченных калорий в разрезе времени
      */
-    private static void getCalories() {
+    private void getCalories() {
         try {
             System.out.println("=================================");
             System.out.println("Введите начальную дату в формате гггг-мм-дд:");
             LocalDate date1 = LocalDate.parse(sc.nextLine());
             System.out.println("Введите конечную дату в формате гггг-мм-дд:");
             LocalDate date2 = LocalDate.parse(sc.nextLine());
-            int countCalories = TrainingService.countCalories(userLogin, date1, date2);
+            int countCalories = trainingService.countCalories(userLogin, date1, date2);
             System.out.println("Количество потраченных калорий за указанное время: " + countCalories);
         } catch (DateTimeParseException | IndexOutOfBoundsException | InputMismatchException | NullPointerException e) {
             System.out.println(ERROR_INPUT_TEXT);
@@ -155,9 +165,9 @@ public class DialogUser {
      * Просмотр всех своих треннировок для User
      * Плюс редактирование тренировок
      */
-    private static void getAllMyTraining() {
+    private void getAllMyTraining() {
         try {
-            ArrayList<Training> trainings = TrainingService.watchAllMyTraining(userLogin);
+            List<Training> trainings = trainingService.watchAllMyTraining(userLogin);
             for (int i = 0; i < trainings.size(); i++) {
                 System.out.print((i + 1) + " - ");
                 System.out.println(trainings.get(i));
@@ -198,10 +208,10 @@ public class DialogUser {
                         System.out.println("Укажите новую дополнительную информацию:");
                         String comment = sc.nextLine();
                         trainings.set(indexTrain, new Training(date, type, duration, caloriesBurned, comment));
-                        TrainingService.replaseSet(userLogin, trainings);
+                        trainingService.replaseSet(userLogin, trainings);
                     } else if (choice == 2) {
                         trainings.remove(indexTrain);
-                        TrainingService.replaseSet(userLogin, trainings);
+                        trainingService.replaseSet(userLogin, trainings);
                     }
                 } catch (DateTimeParseException | IndexOutOfBoundsException | InputMismatchException e) {
                     System.out.println(ERROR_INPUT_TEXT);
@@ -215,7 +225,7 @@ public class DialogUser {
     /**
      * Добавление новой тренировки
      */
-    private static void addNewTraining() {
+    private void addNewTraining() {
         System.out.println("=================================");
         System.out.println("Введите дату в формате гггг-мм-дд:");
         try {
@@ -233,7 +243,11 @@ public class DialogUser {
             sc.nextLine();
             System.out.println("Укажите дополнительную информацию по тренировке:");
             String comment = sc.nextLine();
-            TrainingService.addNewTraining(userLogin, new Training(date, type, duration, caloriesBurned, comment));
+            if (trainingService.addNewTraining(userLogin, new Training(date, type, duration, caloriesBurned, comment))){
+                System.out.println("Тренировка добавлена");
+            } else {
+                System.out.println("Тренировка не добавлена (Тренировка указанного типа уже заведена в указанную дату)");
+            }
         } catch (DateTimeParseException | IndexOutOfBoundsException | InputMismatchException e) {
             System.out.println(ERROR_INPUT_TEXT);
         }
@@ -244,19 +258,19 @@ public class DialogUser {
      *
      * @return возвращает новый раздел меню для перехода
      */
-    private static Menu Authentication() {
+    private Menu Authentication() {
         System.out.println("=================================");
         System.out.println("Введите ЛОГИН пользователя:");
         userLogin = sc.nextLine();
         System.out.println("Введите ПАРОЛЬ пользователя:");
         String password = sc.nextLine();
-        return UserService.authorization(userLogin, password);
+        return userService.authorization(userLogin, password);
     }
 
     /**
      * Регистрация нового пользователя
      */
-    private static void RegisterUser() {
+    private void RegisterUser() {
         System.out.println("=================================");
         System.out.println("Введите ФИО пользователя:");
         String fio = sc.nextLine();
@@ -264,6 +278,6 @@ public class DialogUser {
         String login = sc.nextLine();
         System.out.println("Введите ПАРОЛЬ пользователя:");
         String password = sc.nextLine();
-        UserService.addNewUser(fio, login, password);
+        userService.addNewUser(fio, login, password);
     }
 }

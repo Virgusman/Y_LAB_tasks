@@ -1,19 +1,22 @@
 package out.service;
 
 import out.entites.Training;
-import out.repositories.TrainingRepositories;
+import out.repositories.TrainingRepository;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
  * Бизнес логика по работе с Тренировками
  */
 public class TrainingService {
+
+    private final TrainingRepository trainingRepository;
+
+    public TrainingService() {
+        this.trainingRepository = new TrainingRepository();
+    }
 
     /**
      * Добавление новой тренировки.
@@ -22,10 +25,8 @@ public class TrainingService {
      * @param userLogin ключ значение для сохранения тренировки
      * @param training тренировка для сохранения
      */
-    public static void addNewTraining(String userLogin, Training training) {
-        String s = (TrainingRepositories.addNewTraining(userLogin, training)) ?
-                "Тренировка добавлена" : "Тренировка не добавлена (Тренировка указанного типа уже заведена в указанную дату)";
-        System.out.println(s);
+    public boolean addNewTraining(String userLogin, Training training) {
+        return trainingRepository.addNewTraining(userLogin, training);
     }
 
     /**
@@ -34,8 +35,8 @@ public class TrainingService {
      * @param userLogin поиск по ключу в мапе
      * @return возвращет список тренировок в отсортированном виде по дате
      */
-    public static ArrayList<Training> watchAllMyTraining(String userLogin) {
-        ArrayList<Training> trainings = new ArrayList<>(TrainingRepositories.getAllTrainigForUser(userLogin));
+    public List<Training> watchAllMyTraining(String userLogin) {
+        ArrayList<Training> trainings = new ArrayList<>(trainingRepository.getAllTrainingForUser(userLogin));
         trainings = (ArrayList<Training>) trainings.stream()
                 .sorted(Comparator.comparing(Training::getDate))
                 .collect(Collectors.toList());
@@ -48,8 +49,8 @@ public class TrainingService {
      * @param userLogin обновление по ключу (логин пользователя)
      * @param trainings обновлённый список тренировок
      */
-    public static void replaseSet(String userLogin, ArrayList<Training> trainings) {
-        TrainingRepositories.replaseSet(userLogin, new HashSet<>(trainings));
+    public void replaseSet(String userLogin, List<Training> trainings) {
+        trainingRepository.replaseSet(userLogin, new HashSet<>(trainings));
     }
 
 
@@ -61,8 +62,8 @@ public class TrainingService {
      * @param date2 Дата окончания отрезка времени
      * @return возвращает числовое значение - сумма каллорий
      */
-    public static int countCalories(String userLogin, LocalDate date1, LocalDate date2) {
-        ArrayList<Training> trains= TrainingService.watchAllMyTraining(userLogin);
+    public int countCalories(String userLogin, LocalDate date1, LocalDate date2) {
+        List<Training> trains= watchAllMyTraining(userLogin);
         trains = (ArrayList<Training>) trains.stream()
                 .filter(n -> (n.getDate().isAfter(date1)) && (n.getDate().isBefore(date2)))
                 .collect(Collectors.toList());
@@ -79,7 +80,7 @@ public class TrainingService {
      *
      * @return возвращает все тренировки для всех пользователей
      */
-    public static HashMap<String, HashSet<Training>> getAllTrainUsers() {
-        return TrainingRepositories.getTraining();
+    public Map<String, Set<Training>> getAllTrainUsers() {
+        return trainingRepository.getTraining();
     }
 }

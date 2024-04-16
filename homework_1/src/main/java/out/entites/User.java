@@ -1,58 +1,29 @@
 package out.entites;
 
+import lombok.Getter;
+import lombok.Setter;
 import java.util.Objects;
-
 /**
  * Модель "Пользователь"
  */
+@Getter
+@Setter
 public class User {
 
     /** Фамилия Имя Отчество */
-    String fio;
+    private String fio;
     /** логин пользователя */
-    String login;
+    private String login;
     /** пароль пользователя */
-    String password;
+    private String password;
     /** Уровень доступа */
-    Access access;
+    private Role role;
 
     public User(String fio, String login, String password) {
         this.fio = fio;
         this.login = login;
         this.password = password;
-        access = Access.USER;
-    }
-
-    public String getFio() {
-        return fio;
-    }
-
-    public void setFio(String fio) {
-        this.fio = fio;
-    }
-
-    public String getLogin() {
-        return login;
-    }
-
-    public void setLogin(String login) {
-        this.login = login;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public Access getAccess() {
-        return access;
-    }
-
-    public void setAccess(Access access) {
-        this.access = access;
+        this.role = Role.USER;
     }
 
     @Override

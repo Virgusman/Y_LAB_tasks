@@ -1,7 +1,5 @@
 package out.entites;
-
 import java.util.HashSet;
-
 /**
  * Типы тренировок списком
  */

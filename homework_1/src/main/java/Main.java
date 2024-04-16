@@ -8,10 +8,12 @@ import static in.Menu.*;
  *
  */
 public class Main {
+
     public static void main(String[] args) {
+        DialogUser dialogUser = new DialogUser();
         Menu menu = MAIN;
         while (!(menu == EXIT)) {
-            menu = DialogUser.run(menu);
+            menu = dialogUser.run(menu);
         }
     }
 }

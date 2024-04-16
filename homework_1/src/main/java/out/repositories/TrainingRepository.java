@@ -7,25 +7,23 @@ import java.util.*;
 /**
  * Хранение всех тренировок
  */
-public class TrainingRepositories {
+public class TrainingRepository {
 
-    /** Мапа для хранеия тренировок по ключу (логин пользователя) */
-    private static final HashMap<String, HashSet<Training>> trainings = new HashMap<>();
+    /**
+     * Мапа для хранеия тренировок по ключу (логин пользователя)
+     */
+    private final Map<String, Set<Training>> trainings = new HashMap<>();
 
     /**
      * Добавление тренировки в хранилище для авторизованного пользователя
      *
      * @param userLogin логин пользователя в качестве ключа
-     * @param training тренировка для сохранения в мапу
+     * @param training  тренировка для сохранения в мапу
      * @return Возвращает true при успешном добавлении
      */
-    public static boolean addNewTraining(String userLogin, Training training) {
-        if (trainings.containsKey(userLogin)){
-            return trainings.get(userLogin).add(training);
-        } else {
-            trainings.put(userLogin, new HashSet<>(Collections.singletonList(training)));
-            return true;
-        }
+    public boolean addNewTraining(String userLogin, Training training) {
+        trainings.putIfAbsent(userLogin, new HashSet<>());
+        return trainings.get(userLogin).add(training);
     }
 
     /**
@@ -34,17 +32,17 @@ public class TrainingRepositories {
      * @param userLogin поиск тренировок по ключу (логин пользователя)
      * @return возвращается множество всех тренировок пользователя
      */
-    public static HashSet<Training> getAllTrainigForUser(String userLogin) {
-        return trainings.get(userLogin);
+    public Set<Training> getAllTrainingForUser(String userLogin) {
+        return new HashSet<>(trainings.get(userLogin));
     }
 
     /**
      * Обновление списка тренировок для пользователя
      *
      * @param userLogin обновление тренировок по ключу (логин пользователя)
-     * @param training обновлённый список тренировк для сохранения
+     * @param training  обновлённый список тренировк для сохранения
      */
-    public static void replaseSet(String userLogin, HashSet<Training> training) {
+    public void replaseSet(String userLogin, HashSet<Training> training) {
         trainings.put(userLogin, training);
     }
 
@@ -53,7 +51,7 @@ public class TrainingRepositories {
      *
      * @return возвращает мапу тренировок
      */
-    public static HashMap<String, HashSet<Training>> getTraining() {
+    public Map<String, Set<Training>> getTraining() {
         return trainings;
     }
 }

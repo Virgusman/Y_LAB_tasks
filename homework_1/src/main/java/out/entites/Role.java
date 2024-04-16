@@ -3,7 +3,7 @@ package out.entites;
 /**
  * Уровни доступа для пользователей
  */
-public enum Access {
+public enum Role {
     USER,
     ADMIN
 }

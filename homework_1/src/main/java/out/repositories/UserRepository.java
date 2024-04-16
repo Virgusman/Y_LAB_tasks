@@ -1,9 +1,11 @@
 package out.repositories;
 
-import out.entites.Access;
+import out.entites.Role;
 import out.entites.User;
 
 import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Работа с хранилищем пользователей
@@ -11,27 +13,28 @@ import java.util.HashSet;
 public class UserRepository {
 
 
-    /** Множество для хранения пользователей */
-    private static final HashSet<User> users = new HashSet<User>();
+    /**
+     * Множество для хранения пользователей
+     */
+    private final Set<User> users = new HashSet<>();
 
-    /** добавление начальных пользователей */
-    static {
+    /* добавление начальных пользователей */ {
         User user = new User("admin", "admin", "admin");
-        user.setAccess(Access.ADMIN);
+        user.setRole(Role.ADMIN);
         users.add(user);
 
         user = new User("user", "user", "user");
-        user.setAccess(Access.USER);
+        user.setRole(Role.USER);
         users.add(user);
     }
 
     /**
-     * Добавление нового пользователя в хралище
+     * Добавление нового пользователя в хранилище
      *
      * @param user Новый пользователь для добавления
      * @return true при успешном добавлении
      */
-    public static boolean addNewUser(User user) {
+    public boolean addNewUser(User user) {
         return users.add(user);
     }
 
@@ -41,17 +44,7 @@ public class UserRepository {
      * @param user получения пользователя по Логину/паролю
      * @return возвращается найденного пользователя
      */
-    public static User findUser(User user) {
-        return users.stream().filter(n -> n.equals(user)).findFirst().get();
-    }
-
-    /**
-     * Проверка на наличие Юзера в хралищие при аунтетификации
-     *
-     * @param user поиск по сущности пользователя логин/пароль
-     * @return возвращает true если данный пользователь найден
-     */
-    public static boolean containsUser(User user) {
-        return users.contains(user);
+    public Optional<User> findUser(User user) {
+        return users.stream().filter(n -> n.equals(user)).findFirst();
     }
 }
