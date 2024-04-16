@@ -64,7 +64,7 @@ public class TrainingService {
      */
     public int countCalories(String userLogin, LocalDate date1, LocalDate date2) {
         List<Training> trains= watchAllMyTraining(userLogin);
-        trains = (ArrayList<Training>) trains.stream()
+        trains = trains.stream()
                 .filter(n -> (n.getDate().isAfter(date1)) && (n.getDate().isBefore(date2)))
                 .collect(Collectors.toList());
         int count = 0;
