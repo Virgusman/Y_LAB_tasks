@@ -46,7 +46,7 @@ public class TrainingRepositoryImpl implements TrainingRepository {
     public boolean addNewTraining(String userLogin, Training training) throws SQLException {
         int id = returnIdByLogin(userLogin);
         //Проверка существует ли тренировка в БД
-        String selectSql = "SELECT COUNT(*) FROM trainings.training WHERE (date = ?) and (type = ?) and (id = ?)";
+        String selectSql = "SELECT COUNT(*) FROM trainings.training WHERE (date = ?) and (type = ?) and (user_id = ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(selectSql)) {
             pstmt.setDate(1, Date.valueOf(training.getDate()));
             pstmt.setString(2, training.getType());
