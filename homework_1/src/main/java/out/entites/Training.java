@@ -12,6 +12,8 @@ import java.util.Objects;
 @Setter
 public class Training {
 
+    /** ID тренировки */
+    private int id;
     /** Дата тренировки */
     private LocalDate date;
 
@@ -28,6 +30,15 @@ public class Training {
     private String comment;
 
     public Training(LocalDate date, String type, int duration, int caloriesBurned, String comment) {
+        this.date = date;
+        this.type = type;
+        this.duration = duration;
+        this.caloriesBurned = caloriesBurned;
+        this.comment = comment;
+    }
+
+    public Training(int id, LocalDate date, String type, int duration, int caloriesBurned, String comment) {
+        this.id = id;
         this.date = date;
         this.type = type;
         this.duration = duration;

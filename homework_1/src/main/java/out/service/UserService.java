@@ -6,6 +6,8 @@ import out.entites.User;
 import out.repositories.UserRepository;
 import out.repositories.UserRepositoryImpl;
 
+import java.sql.SQLException;
+
 /**
  * Бизнес логина по работе с пользователями
  */
@@ -24,7 +26,7 @@ public class UserService {
      * @param login Логин пользователя
      * @param password пароль пользователя
      */
-    public void addNewUser(String fio, String login, String password) {
+    public void addNewUser(String fio, String login, String password) throws SQLException {
         String s = (userRepository.addNewUser(new User(fio, login, password))) ? "\nНовый пользователь добавлен"
                 : "\nПользователь с таким ЛОГИНОМ уже занят";
         System.out.println(s);
@@ -37,7 +39,7 @@ public class UserService {
      * @param password пароль пользователя
      * @return точка входа в меню
      */
-    public Menu authorization(String login, String password) {
+    public Menu authorization(String login, String password) throws SQLException {
         User user = new User("", login, password);
         if (userRepository.findUser(user).isPresent()) {
             User userBase = userRepository.findUser(user).get();

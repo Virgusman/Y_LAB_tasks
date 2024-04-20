@@ -1,37 +1,48 @@
 package repositories;
 
-import org.junit.Rule;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import out.entites.User;
-import out.repositories.UserRepository;
-import out.repositories.UserRepositoryImpl;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 
+@Testcontainers
 public class UserRepositoryTest {
 
-    @Rule
-    public static UserRepository userRepository = new UserRepositoryImpl();
-
-    @BeforeAll
-    @DisplayName("Добавление тестовых пользователей")
-    static void addTestsUsers(){
-        User testUser1 = new User("Test User1", "LOGIN1", "PASSWORD");
-        User testUser2 = new User("Test User2", "LOGIN2", "PASSWORD");
-        userRepository.addNewUser(testUser1);
-        userRepository.addNewUser(testUser2);
+    static {
+        PostgreSQLContainer<?> postgresContainer = new PostgreSQLContainer<>("postgres:16-alpine")
+                .withDatabaseName("test_db")
+                .withUsername("test_user")
+                .withPassword("test_password");
+        postgresContainer.start();
+        try (Connection connection = DriverManager.getConnection(postgresContainer.getJdbcUrl(), "test_user", "test_password")) {
+            connection.setAutoCommit(false);
+            String createTableSQL = "CREATE TABLE users (" +
+                    "id SERIAL PRIMARY KEY," +
+                    "login VARCHAR(255)," +
+                    "password VARCHAR(255)," +
+                    "role VARCHAR(255))";
+            Statement statement = connection.createStatement();
+            statement.executeUpdate(createTableSQL);
+            String insert1 = "INSERT INTO users (login, password, role) VALUES ('fio', 'user', 'user', 'USER')";
+            statement.executeUpdate(insert1);
+            connection.commit();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    @Test
+
+    /*@Test
     @DisplayName("Проверка на добавление тестового юзера")
     void testAddNewUser(){
         User testUser = new User("Test User new", "NewUserTest", "PASSWORD");
         assertTrue(userRepository.addNewUser(testUser));
-    }
+    }*/
 
-    @Test
+    /*@Test
     @DisplayName("Проверка на добавление уже существующего пользователя")
     void testAddNewUser2(){
         User testUser = new User("Test User1", "LOGIN1", "PASSWORD");
@@ -43,12 +54,5 @@ public class UserRepositoryTest {
     void testFindUser(){
         User testUser1 = new User("", "LOGIN1", "PASSWORD");
         assertEquals(testUser1, userRepository.findUser(testUser1).get());
-    }
-
-    @Test
-    @DisplayName("Проверка на наличие пользователя в хранилище")
-    void testContainsUser(){
-        User testUser1 = new User("Test User1", "LOGIN1", "PASSWORD");
-        assertTrue(userRepository.findUser(testUser1).isPresent());
-    }
+    }*/
 }

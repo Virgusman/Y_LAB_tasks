@@ -6,6 +6,7 @@ import out.service.UserService;
 import out.service.TrainingService;
 import out.utils.Audit;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.*;
@@ -34,10 +35,12 @@ public class DialogUser {
     private final TrainingService trainingService;
 
     private final UserService userService;
+    private final Audit audit;
 
     public DialogUser() {
         this.trainingService = new TrainingService();
         this.userService = new UserService();
+        this.audit = new Audit();
     }
 
     /**
@@ -46,7 +49,7 @@ public class DialogUser {
      * @param menu определение раздела меню
      * @return возвращение нового раздела меню
      */
-    public Menu run(Menu menu) {
+    public Menu run(Menu menu) throws SQLException {
 
         switch (menu) {
             case MAIN -> {
@@ -59,7 +62,7 @@ public class DialogUser {
                     sc.nextLine();
                     break;
                 }
-                Audit.addLog(userLogin, menu, choice);
+                audit.addLog(userLogin, menu, choice);
                 sc.nextLine();
                 if (choice == 1) {
                     RegisterUser();
@@ -79,7 +82,7 @@ public class DialogUser {
                     sc.nextLine();
                     break;
                 }
-                Audit.addLog(userLogin, menu, choice);
+                audit.addLog(userLogin, menu, choice);
                 sc.nextLine();
                 if (choice == 4) {
                     userLogin = "Неизвестный";
@@ -106,7 +109,7 @@ public class DialogUser {
                     sc.nextLine();
                     break;
                 }
-                Audit.addLog(userLogin, menu, choice);
+                audit.addLog(userLogin, menu, choice);
                 sc.nextLine();
                 if (choice == 4) {
                     return MAIN;
@@ -123,7 +126,7 @@ public class DialogUser {
                     getAllTrainUsers();
                     return ADMIN_MENU;
                 } else if (choice == 6) {
-                    Audit.printLogAudit();
+                    audit.printLogAudit();
                     return ADMIN_MENU;
                 }
             }
@@ -134,7 +137,7 @@ public class DialogUser {
     /**
      * Просмотр всех тренировок всех пользователей (для админа)
      */
-    private void getAllTrainUsers() {
+    private void getAllTrainUsers() throws SQLException {
         Map<String, Set<Training>> trainings = trainingService.getAllTrainUsers();
         for (Map.Entry<String, Set<Training>> entry : trainings.entrySet()) {
             System.out.println("Тренировки учетной записи: " + entry.getKey());
@@ -156,7 +159,8 @@ public class DialogUser {
             LocalDate date2 = LocalDate.parse(sc.nextLine());
             int countCalories = trainingService.countCalories(userLogin, date1, date2);
             System.out.println("Количество потраченных калорий за указанное время: " + countCalories);
-        } catch (DateTimeParseException | IndexOutOfBoundsException | InputMismatchException | NullPointerException e) {
+        } catch (DateTimeParseException | IndexOutOfBoundsException | InputMismatchException | NullPointerException |
+                 SQLException e) {
             System.out.println(ERROR_INPUT_TEXT);
         }
     }
@@ -171,6 +175,7 @@ public class DialogUser {
             for (int i = 0; i < trainings.size(); i++) {
                 System.out.print((i + 1) + " - ");
                 System.out.println(trainings.get(i));
+
             }
             System.out.println("\nВыберете дейстие:");
             System.out.println("1 - Выбрать тренировку для редактирования");
@@ -181,6 +186,7 @@ public class DialogUser {
                     System.out.println("Введите номер тренировки:");
                     int indexTrain = sc.nextInt() - 1;
                     System.out.println(trainings.get(indexTrain));
+                    int indexInDB = trainings.get(indexTrain).getId();
                     System.out.println("1 - Редактировать тренировку");
                     System.out.println("2 - Удалить тренировку");
                     System.out.println("3 - Вернуться в меню");
@@ -207,17 +213,19 @@ public class DialogUser {
                         System.out.println("Дополнительная информация - " + trainings.get(indexTrain).getComment());
                         System.out.println("Укажите новую дополнительную информацию:");
                         String comment = sc.nextLine();
-                        trainings.set(indexTrain, new Training(date, type, duration, caloriesBurned, comment));
-                        trainingService.replaseSet(userLogin, trainings);
+                        //trainings.set(indexTrain, new Training(date, type, duration, caloriesBurned, comment));
+                        trainingService.replaseSet(indexInDB, new Training(date, type, duration, caloriesBurned, comment));
                     } else if (choice == 2) {
-                        trainings.remove(indexTrain);
-                        trainingService.replaseSet(userLogin, trainings);
+                        //trainings.remove(indexTrain);
+                        trainingService.deleteTrain(indexInDB);
                     }
                 } catch (DateTimeParseException | IndexOutOfBoundsException | InputMismatchException e) {
+                    System.out.println(e);
                     System.out.println(ERROR_INPUT_TEXT);
                 }
             }
-        } catch (NullPointerException | InputMismatchException e) {
+        } catch (NullPointerException | InputMismatchException | SQLException e) {
+            System.out.println(e);
             System.out.println(ERROR_INPUT_TEXT);
         }
     }
@@ -225,7 +233,7 @@ public class DialogUser {
     /**
      * Добавление новой тренировки
      */
-    private void addNewTraining() {
+    private void addNewTraining() throws SQLException {
         System.out.println("=================================");
         System.out.println("Введите дату в формате гггг-мм-дд:");
         try {
@@ -258,7 +266,7 @@ public class DialogUser {
      *
      * @return возвращает новый раздел меню для перехода
      */
-    private Menu Authentication() {
+    private Menu Authentication() throws SQLException {
         System.out.println("=================================");
         System.out.println("Введите ЛОГИН пользователя:");
         userLogin = sc.nextLine();
@@ -270,7 +278,7 @@ public class DialogUser {
     /**
      * Регистрация нового пользователя
      */
-    private void RegisterUser() {
+    private void RegisterUser() throws SQLException {
         System.out.println("=================================");
         System.out.println("Введите ФИО пользователя:");
         String fio = sc.nextLine();
