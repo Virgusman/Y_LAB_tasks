@@ -4,6 +4,7 @@ import out.entites.Training;
 import out.repositories.TrainingRepository;
 import out.repositories.TrainingRepositoryImpl;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -26,7 +27,7 @@ public class TrainingService {
      * @param userLogin ключ значение для сохранения тренировки
      * @param training тренировка для сохранения
      */
-    public boolean addNewTraining(String userLogin, Training training) {
+    public boolean addNewTraining(String userLogin, Training training) throws SQLException {
         return trainingRepository.addNewTraining(userLogin, training);
     }
 
@@ -36,7 +37,7 @@ public class TrainingService {
      * @param userLogin поиск по ключу в мапе
      * @return возвращет список тренировок в отсортированном виде по дате
      */
-    public List<Training> watchAllMyTraining(String userLogin) {
+    public List<Training> watchAllMyTraining(String userLogin) throws SQLException {
         ArrayList<Training> trainings = new ArrayList<>(trainingRepository.getAllTrainingForUser(userLogin));
         trainings = (ArrayList<Training>) trainings.stream()
                 .sorted(Comparator.comparing(Training::getDate))
@@ -47,11 +48,11 @@ public class TrainingService {
     /**
      * Обновление списка тренировок пользователя
      *
-     * @param userLogin обновление по ключу (логин пользователя)
-     * @param trainings обновлённый список тренировок
+     * @param id ID тренировки
+     * @param trainings тренировка для обновления
      */
-    public void replaseSet(String userLogin, List<Training> trainings) {
-        trainingRepository.replaseSet(userLogin, new HashSet<>(trainings));
+    public void replaseSet(int id, Training trainings) throws SQLException {
+        trainingRepository.replaseSet(id, trainings);
     }
 
 
@@ -63,7 +64,7 @@ public class TrainingService {
      * @param date2 Дата окончания отрезка времени
      * @return возвращает числовое значение - сумма каллорий
      */
-    public int countCalories(String userLogin, LocalDate date1, LocalDate date2) {
+    public int countCalories(String userLogin, LocalDate date1, LocalDate date2) throws SQLException {
         List<Training> trains= watchAllMyTraining(userLogin);
         trains = trains.stream()
                 .filter(n -> (n.getDate().isAfter(date1)) && (n.getDate().isBefore(date2)))
@@ -81,7 +82,15 @@ public class TrainingService {
      *
      * @return возвращает все тренировки для всех пользователей
      */
-    public Map<String, Set<Training>> getAllTrainUsers() {
+    public Map<String, Set<Training>> getAllTrainUsers() throws SQLException {
         return trainingRepository.getTraining();
+    }
+
+    /**
+     * Удалить тренировку по ID
+     * @param indexTrain ID тренировки
+     */
+    public void deleteTrain(int indexTrain) throws SQLException {
+        trainingRepository.deleteTrain(indexTrain);
     }
 }

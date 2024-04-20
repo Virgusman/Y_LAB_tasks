@@ -1,7 +1,9 @@
 package out.utils;
 
 import in.Menu;
+import out.repositories.AuditRepository;
 
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -12,15 +14,16 @@ import java.util.Map;
  */
 public class Audit {
 
-    /**
-     * Список всех записей в аудит
-     */
-    private static final Map<String, HashMap<LocalDateTime, String>> auditLog = new HashMap<>();
+    public AuditRepository auditRepository;
+
+    public Audit() {
+        this.auditRepository = new AuditRepository();
+    }
 
     /**
      * Форматирование даты и времени
      */
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss ");
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss ");
 
     /**
      * Добавление новой записи в аудит
@@ -29,7 +32,7 @@ public class Audit {
      * @param menu   этап в меню совершенного дейсвтия
      * @param choice выбранное действие полльзователем
      */
-    public static void addLog(String user, Menu menu, int choice) {
+    public void addLog(String user, Menu menu, int choice) throws SQLException {
         LocalDateTime dateTime = LocalDateTime.now();
         switch (menu) {
             case MAIN -> {
@@ -53,7 +56,8 @@ public class Audit {
     /**
      * Вывод всех записей в консоль
      */
-    public static void printLogAudit() {
+    public void printLogAudit() throws SQLException {
+        Map<String, HashMap<LocalDateTime, String>> auditLog = auditRepository.getAll();
         for (String user : auditLog.keySet()) {
             System.out.println("Аудиты для пользователя " + user + ":");
             HashMap<LocalDateTime, String> userAuditLogs = auditLog.get(user);
@@ -65,12 +69,12 @@ public class Audit {
 
     /**
      * Запись данных в аудит
-     * @param username логин пользователя
+     *
+     * @param username  логин пользователя
      * @param timestamp время записи
-     * @param action описание действия
+     * @param action    описание действия
      */
-    private static void addAuditLog(String username, LocalDateTime timestamp, String action) {
-        auditLog.putIfAbsent(username, new HashMap<>());
-        auditLog.get(username).put(timestamp, action);
+    private void addAuditLog(String username, LocalDateTime timestamp, String action) throws SQLException {
+        auditRepository.addLog(username, timestamp, action);
     }
 }

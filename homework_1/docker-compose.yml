@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+        POSTGRES_DB:  db_ylab
+        POSTGRES_USER: ylab
+        POSTGRES_PASSWORD: ylab
+    ports:
+      - "5432:5432"
