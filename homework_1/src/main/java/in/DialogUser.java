@@ -251,7 +251,7 @@ public class DialogUser {
             sc.nextLine();
             System.out.println("Укажите дополнительную информацию по тренировке:");
             String comment = sc.nextLine();
-            if (trainingService.addNewTraining(userLogin, new Training(date, type, duration, caloriesBurned, comment))){
+            if (trainingService.addNewTraining(userLogin, new Training(date, type, duration, caloriesBurned, comment))) {
                 System.out.println("Тренировка добавлена");
             } else {
                 System.out.println("Тренировка не добавлена (Тренировка указанного типа уже заведена в указанную дату)");

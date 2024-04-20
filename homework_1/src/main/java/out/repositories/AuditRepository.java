@@ -1,18 +1,21 @@
 package out.repositories;
 
-import out.entites.Training;
-import out.entites.User;
 import out.utils.LiquibaseExample;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.*;
 
+/**
+ * Работа с БД таблицы аудит
+ */
 public class AuditRepository {
     private Connection connection;
 
+    /**
+     * Ининиализация подключение к БД
+     */
     public AuditRepository() {
         Properties prop = new Properties();
         try (InputStream input = LiquibaseExample.class.getClassLoader().getResourceAsStream("database.properties")) {
